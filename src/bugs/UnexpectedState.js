@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, Heading, Text } from "grommet";
 import { AddCircle, SubtractCircle } from "grommet-icons";
 
@@ -8,7 +8,7 @@ import { expect, useBugTest } from "./tests";
 const Bug = () => {
   return (
     <Template bug={bug}>
-      <ShySpider />
+      <ShySpider level={1}/>
     </Template>
   );
 };
@@ -26,6 +26,10 @@ const ShySpider = (props) => {
     setPurchaseLevel(level);
   };
 
+  useEffect(() => {
+    console.log('props.level', props.level, 'state.purchaseLevel', purchaseLevel)
+  }, [props.level, purchaseLevel]);
+
   useBugTest("should display a level", ({ findByTestId }) => {
     expect(findByTestId("level").innerText).to.match(/Level \d+/);
   });
@@ -39,25 +43,27 @@ const ShySpider = (props) => {
   return (
     <>
       <Heading level={3}>{bug.name}</Heading>
-      <BugAttributes
+      {props.level !==  2 ? <BugAttributes
         initialLevel={props.level}
         onLevelChange={handleOnLevelChange}
-      />
+      /> : null}
       {purchaseLevel ? <PurchaseSummary purchaseLevel={purchaseLevel} /> : null}
     </>
   );
 };
 
 function BugAttributes({ initialLevel, onLevelChange }) {
-  let currentLevel = useState(initialLevel);
+  const [currentLevel, setCurrentLevel] = useState(initialLevel);
 
   const onLevelUp = () => {
-    currentLevel += 1;
-    onLevelChange(currentLevel);
+    const newLevel=currentLevel + 1;
+    setCurrentLevel(newLevel);
+    onLevelChange(newLevel);
   };
   const onLevelDown = () => {
-    currentLevel -= 1;
-    onLevelChange(currentLevel);
+    const newLevel=currentLevel -1;
+    setCurrentLevel(newLevel);
+    onLevelChange(newLevel);
   };
 
   return (

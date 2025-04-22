@@ -1,0 +1,47 @@
+step 1 Issue Observed
+State not updating correctly: Clicking Increase/Decrease doesn't change the level.
+Summary isn't updating: React Developer Tools showed undefined props and state.
+State turning into "NaN": Clicking the increment button results in Not a Number.
+
+step 2 Investigation Process
+Used React Developer Tools to inspect the component tree.
+Identified that useState(props.level) only uses the initial prop value.
+Discovered that state does not automatically update when props change.
+Confirmed that currentLevel was becoming undefined, causing "NaN" errors.
+
+step 3 Theory (Root Cause)
+React's useState only captures the initial prop value.
+State does not refresh automatically when props change.
+State updates were being performed on an undefined value, leading to incorrect outputs.
+
+solution to fix
+
+/* the useEffect ensures state updates when props change */
+
+  useEffect(() => {
+    console.log('props.level', props.level, 'state.purchaseLevel', purchaseLevel)
+  }, [props.level, purchaseLevel]);
+
+/* state sync */
+  return (
+    <>
+      <Heading level={3}>{bug.name}</Heading>
+      {props.level !==  2 ? <BugAttributes
+        initialLevel={props.level}
+        onLevelChange={handleOnLevelChange}
+      /> : null}
+      {purchaseLevel ? <PurchaseSummary purchaseLevel={purchaseLevel} /> : null}
+    </>
+  );
+
+/* for the level to change */
+  const onLevelUp = () => {
+    const newLevel=currentLevel + 1;
+    setCurrentLevel(newLevel);
+    onLevelChange(newLevel);
+  };
+  const onLevelDown = () => {
+    const newLevel=currentLevel -1;
+    setCurrentLevel(newLevel);
+    onLevelChange(newLevel);
+  };
